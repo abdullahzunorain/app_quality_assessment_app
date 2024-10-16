@@ -24,19 +24,36 @@ def load_model():
 # Load model and feature extractor
 model, feature_extractor = load_model()
 
+
 # Function to predict the apple condition
 def predict_image(image):
+    # Ensure the image is in RGB format
+    try:
+        # Convert the image to RGB (removing alpha channel if it exists)
+        if image.mode == "RGBA":
+            image = image.convert("RGB")  # Convert RGBA to RGB
+        elif image.mode != "RGB":
+            image = image.convert("RGB")  # Convert any other format to RGB
+    except Exception as e:
+        st.error(f"Error converting image to RGB: {e}")
+        return "Error"
+
     # Preprocess the image
-    inputs = feature_extractor(images=image, return_tensors="pt")
-    outputs = model(**inputs)
-    logits = outputs.logits
-    predicted_class_idx = logits.argmax(-1).item()
+    try:
+        inputs = feature_extractor(images=image, return_tensors="pt")
+        outputs = model(**inputs)
+        logits = outputs.logits
+        predicted_class_idx = logits.argmax(-1).item()
 
-    # Define class names based on the model's output
-    class_names = model.config.id2label  # Fetch the dynamic class labels
+        # Define class names based on the model's output
+        class_names = model.config.id2label  # Fetch the dynamic class labels
 
-    # Return the predicted class name
-    return class_names[predicted_class_idx]
+        # Return the predicted class name
+        return class_names[predicted_class_idx]
+    except Exception as e:
+        st.error(f"Error during prediction: {e}")
+        return "Error"
+
 
 # Design the UI
 st.title("🍎 Apple Quality Assessment")
