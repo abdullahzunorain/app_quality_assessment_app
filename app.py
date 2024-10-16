@@ -6,13 +6,19 @@ import torch
 # Set page title and layout
 st.set_page_config(page_title="Apple Quality Assessment", layout="wide")
 
+
 # Function to load pre-trained model and feature extractor
 @st.cache_resource
 def load_model():
     model_name = "bazaar/v_apple_leaf_disease_detection"  # Updated model name
-    model = AutoModelForImageClassification.from_pretrained(model_name)
-    feature_extractor = AutoFeatureExtractor.from_pretrained(model_name)
-    return model, feature_extractor
+    try:
+        model = AutoModelForImageClassification.from_pretrained(model_name)
+        feature_extractor = AutoFeatureExtractor.from_pretrained(model_name)
+        return model, feature_extractor
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return None, None  # Return None to avoid further errors
+
 
 # Load model and feature extractor
 model, feature_extractor = load_model()
